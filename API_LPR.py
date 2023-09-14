@@ -62,7 +62,7 @@ for i in range(60):
 cap.release()
 cv.destroyAllWindows()
 
-from Russian_LPR import *
+# from Russian_LPR import *
 
 try:
     print("API")
