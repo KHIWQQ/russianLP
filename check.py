@@ -4,11 +4,47 @@ import time
 import calendar
 import multiprocessing as mp
 import requests
+import requests
+import numpy as np
+from gtts import gTTS
+import os
 
 cap = cv2.VideoCapture(0)
 
+if not cap.isOpened():
+    print("Cannot open camera")
+    exit()
+
 global arTabain
 arTabain = []
+
+def apiLPR():
+    url = "https://api.aiforthai.in.th/lpr-v2"
+    payload = {'crop': '1', 'rotate': '1'}
+    files = {'image': open('frame.jpg', 'rb')}
+
+    headers = {
+        'Apikey': "hPVns5FnJHma0iYoJ9TFvIbtLlxAoSlc",
+    }
+
+    response = requests.post(url, files=files, data=payload, headers=headers)
+
+    print(response.json())
+    A = response.json()
+    payload = A[0]
+    global tabain
+    tabain = payload["lpr"]
+    print(tabain)
+    arTabain.append(tabain)
+    GTTS()
+
+def GTTS():
+    tts = gTTS(text='รถทะเบียน'+tabain, lang='th')
+    tts.save('Hello.mp3')
+
+    file = "Hello.mp3"
+    print("Play mp3")
+    os.system("mpg123 "+file)
 
 def detectCam():
     # Check if the webcam is opened correctly
@@ -28,6 +64,7 @@ def easyOCR(gray_plates):
         arTabain.append(detected_text)
         print(arTabain)
         print('ข้อความที่ตรวจจับได้:', detected_text)
+        apiLPR()
         return detected_text  # Return the detected text
 
 def detectTabain():
@@ -76,5 +113,27 @@ def detectTabain():
 
     cap.release()
     cv2.destroyAllWindows()
+        
+# while True:
+for i in range(60):
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    # if frame is read correctly ret is True
+    if not ret:
+        print("Can't receive frame (stream end?). Exiting ...")
+        break
+    # Our operations on the frame come here
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Display the resulting frame 
+    cv2.imshow('frame', gray)
+    cv2.imwrite("frame.jpg", frame)
+    # print("save img successfully")
+    if cv2.waitKey(1) == ord('q'):
+        break
+
+# When everything done, release the capture
+cap.release()
+cv2.destroyAllWindows()
+
 
 detectTabain()
