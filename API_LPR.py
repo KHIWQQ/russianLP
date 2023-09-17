@@ -52,7 +52,8 @@ for i in range(60):
     # Our operations on the frame come here
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     # Display the resulting frame 
-    cv.imshow('frame', gray)
+    # cv.imshow('gray', gray)
+    cv.imshow('frame', frame)
     cv.imwrite("frame.jpg", frame)
     # print("save img successfully")
     if cv.waitKey(1) == ord('q'):
@@ -68,6 +69,6 @@ try:
     print("API")
     apiLPR()
 except:
-    print("OCR")
+    print("Error and restart")
     # detectTabain()
     apiLPR()
